@@ -31,7 +31,6 @@ public class Ball extends TextureRegion {
     public Vector2 position;
 
     public Vector2 positionOnScreen;
-    public Vector2 originOnScreen;
 
     public Vector2 velocity;
 
@@ -49,7 +48,6 @@ public class Ball extends TextureRegion {
     public Ball(Vector2 position, Texture texture) {
         this.position = position;
         this.positionOnScreen = new Vector2(Ball.SIZE * position.x, Ball.SIZE * position.y + 150);
-        this.originOnScreen = new Vector2(Ball.SIZE * position.x, Ball.SIZE * position.y + 150);
         this.bounds.width = SIZE;
         this.bounds.height = SIZE;
         this.isPush = false;
@@ -194,7 +192,7 @@ public class Ball extends TextureRegion {
         if (this.positionOnScreen.x > Game.WIDTH-SIZE || this.positionOnScreen.x < 0 || this.positionOnScreen.y > Game.HEIGHT-370-SIZE || this.positionOnScreen.y < 150) {
             this.isTouched = false;
             this.isDoubleClicked = false;
-            this.positionOnScreen = this.originOnScreen;
+            this.positionOnScreen = new Vector2(Ball.SIZE * position.x, Ball.SIZE * position.y + 150);
         }
     }
 
