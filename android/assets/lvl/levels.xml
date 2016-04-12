@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<levels>
+    <level name="Level 1" order="1">
+        <ball>
+            <position-x>4</position-x>
+            <position-y>0</position-y>
+        </ball>
+        <ball>
+            <position-x>4</position-x>
+            <position-y>4</position-y>
+        </ball>
+    </level>
+</levels>
