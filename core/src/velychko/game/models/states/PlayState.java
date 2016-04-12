@@ -3,8 +3,6 @@ package velychko.game.models.states;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
 
 import java.util.List;
 
@@ -67,7 +65,15 @@ public class PlayState extends State {
         for (Ball ball : this.balls) {
             ball.getRotation();
             ballsOnField[index++] = ball;
-            spriteBatch.draw(ball, ball.postionOnScreen.x, ball.postionOnScreen.y, Ball.SIZE/2, Ball.SIZE/2, Ball.SIZE, Ball.SIZE, 1, 1, ball.getRotation(), true);
+
+            ball.checkIsOutside();
+
+            if (ball.isDoubleClicked) {
+                ball.positionOnScreen.x += ball.getVelocity().x;
+                ball.positionOnScreen.y += ball.getVelocity().y;
+            }
+
+            spriteBatch.draw(ball, ball.positionOnScreen.x, ball.positionOnScreen.y, Ball.SIZE/2, Ball.SIZE/2, Ball.SIZE, Ball.SIZE, 1, 1, ball.getRotation(), true);
         }
         spriteBatch.end();
     }

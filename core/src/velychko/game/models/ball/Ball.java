@@ -5,8 +5,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
-
 import java.util.Random;
+
+import velychko.game.Game;
 
 /**
  * @author Yaroslav Velychko
@@ -20,7 +21,7 @@ public class Ball extends TextureRegion {
 
     public static final float SIZE = 72;
 
-    public static final float SPEED = 2f;
+    public static final float SPEED = 3f;
 
 
     final Random random = new Random();
@@ -29,13 +30,16 @@ public class Ball extends TextureRegion {
 
     public Vector2 position;
 
-    public Vector2 postionOnScreen;
+    public Vector2 positionOnScreen;
+    public Vector2 originOnScreen;
 
     public Vector2 velocity;
 
     public int direction;
 
     public boolean isPush;
+
+    public boolean isDoubleClicked;
 
     public boolean isPunched;
 
@@ -44,13 +48,16 @@ public class Ball extends TextureRegion {
 
     public Ball(Vector2 position, Texture texture) {
         this.position = position;
-        this.postionOnScreen = new Vector2(Ball.SIZE * position.x, Ball.SIZE * position.y + 150);
+        this.positionOnScreen = new Vector2(Ball.SIZE * position.x, Ball.SIZE * position.y + 150);
+        this.originOnScreen = new Vector2(Ball.SIZE * position.x, Ball.SIZE * position.y + 150);
         this.bounds.width = SIZE;
         this.bounds.height = SIZE;
         this.isPush = false;
+        this.isDoubleClicked = false;
         this.isPunched = false;
         this.isTouched = false;
         this.direction = generateDirection();
+        this.velocity = new Vector2(0, 0);
 
         super.setTexture(texture);
         super.setV2(1.0f);
@@ -110,12 +117,12 @@ public class Ball extends TextureRegion {
         this.position = position;
     }
 
-    public Vector2 getPostionOnScreen() {
-        return postionOnScreen;
+    public Vector2 getPositionOnScreen() {
+        return positionOnScreen;
     }
 
-    public void setPostionOnScreen(Vector2 postionOnScreen) {
-        this.postionOnScreen = postionOnScreen;
+    public void setPositionOnScreen(Vector2 positionOnScreen) {
+        this.positionOnScreen = positionOnScreen;
     }
 
     public Rectangle getBounds() {
@@ -149,13 +156,46 @@ public class Ball extends TextureRegion {
                 rotation = 180;
                 break;
             }
-
             case DIRECTION_LEFT: {
                 rotation = 270;
                 break;
             }
         }
         return rotation - 90;
+    }
+
+    public void setSpeed() {
+        Vector2 speed;
+        switch (this.getDirection()) {
+            case DIRECTION_UP: {
+                speed = new Vector2(0, -SPEED);
+                break;
+            }
+            case DIRECTION_RIGHT: {
+                speed = new Vector2(SPEED, 0);
+                break;
+            }
+            case DIRECTION_DOWN: {
+                speed = new Vector2(0, SPEED);
+                break;
+            }
+            case DIRECTION_LEFT: {
+                speed = new Vector2(-SPEED, 0);
+                break;
+            }
+            default: {
+                speed = new Vector2(0, 0);
+            }
+        }
+        this.setVelocity(speed);
+    }
+
+    public void checkIsOutside() {
+        if (this.positionOnScreen.x > Game.WIDTH-SIZE || this.positionOnScreen.x < 0 || this.positionOnScreen.y > Game.HEIGHT-370-SIZE || this.positionOnScreen.y < 150) {
+            this.isTouched = false;
+            this.isDoubleClicked = false;
+            this.positionOnScreen = this.originOnScreen;
+        }
     }
 
 }
