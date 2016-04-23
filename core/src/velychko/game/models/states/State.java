@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 
+import velychko.game.Game;
+
 /**
  * @author Yaroslav Velychko
  */
@@ -15,7 +17,7 @@ public abstract class State {
     protected GameStateManager gameStateManager;
 
     public State(GameStateManager gameStateManager) {
-        camera = new OrthographicCamera();
+        camera = new OrthographicCamera(Game.getInstance().width, Game.getInstance().height);
         mouse = new Vector3();
         this.gameStateManager = gameStateManager;
     }

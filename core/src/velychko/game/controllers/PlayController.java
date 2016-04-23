@@ -5,6 +5,7 @@ import com.badlogic.gdx.InputProcessor;
 
 import java.util.List;
 
+import velychko.game.Game;
 import velychko.game.models.ball.Ball;
 import velychko.game.models.states.PlayState;
 
@@ -20,54 +21,61 @@ public class PlayController implements InputProcessor {
     public long secondClick = 0;
 
     public PlayState playState;
+    public List<Ball> balls;
 
     public PlayController(List<Ball> balls, PlayState playState) {
         this.playState = playState;
+        this.balls = balls;
     }
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        PlayState playState = this.playState;
-        Ball[] ballsOnField = playState.getBallsOnField();
+        if (!Game.getInstance().isBallInMove) {
+            PlayState playState = this.playState;
+            Ball[] ballsOnField = playState.getBallsOnField();
 
-        int index = 0;
-        for (Ball ball : ballsOnField) {
-            int ballX1 = (int) ball.positionOnScreen.x;
-            int ballY1 = (int) ball.positionOnScreen.y;
+            int index = 0;
+            for (Ball ball : ballsOnField) {
+                int ballX1 = (int) ball.positionOnScreen.x;
+                int ballY1 = (int) ball.positionOnScreen.y;
 
-            int ballX2 = (int) ball.getRegionWidth() + ballX1;
-            int ballY2 = (int) ball.getRegionHeight() + ballY1;
+                int ballX2 = ball.getRegionWidth() + ballX1;
+                int ballY2 = ball.getRegionHeight() + ballY1;
 
-            if (touchBall(screenX, screenY, ballX1, ballY1, ballX2, ballY2)) {
-                if (this.doubleBallIndex == index) {
-                    secondClick =  System.currentTimeMillis();
-                    if ((secondClick - firstClick) < 200) {
-                        ball.isDoubleClicked = true;
-                        ball.setSpeed();
+                if (touchBall(screenX, screenY, ballX1, ballY1, ballX2, ballY2)) {
+                    if (this.doubleBallIndex == index) {
+                        secondClick = System.currentTimeMillis();
+                        if ((secondClick - firstClick) < 200) {
+                            ball.isDoubleClicked = true;
+                            ball.setSpeed();
+                            ball.setBallLine(balls);
+                        }
                     }
+
+                    this.activeBallIndex = index;
+                    this.doubleBallIndex = index;
+                    ball.isTouched = true;
+                    Gdx.input.vibrate(35);
+                    break;
+                } else {
+                    this.activeBallIndex = -1;
+                    ball.isTouched = false;
                 }
-                this.activeBallIndex = index;
-                this.doubleBallIndex = index;
-                ball.isTouched = true;
-                Gdx.input.vibrate(35);
-                break;
-            } else {
-                this.activeBallIndex = -1;
-                ball.isTouched = false;
+                index++;
             }
-            index++;
         }
         return true;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        if (this.activeBallIndex != -1) {
-            firstClick =  System.currentTimeMillis();
-            Ball ball = playState.getBallsOnField()[this.activeBallIndex];
-            defineDirection(screenX, screenY, ball);
+        if (!Game.getInstance().isBallInMove) {
+            if (this.activeBallIndex != -1) {
+                firstClick = System.currentTimeMillis();
+                Ball ball = playState.getBallsOnField()[this.activeBallIndex];
+                defineDirection(screenX, screenY, ball);
+            }
         }
-
         return true;
     }
 
@@ -80,8 +88,8 @@ public class PlayController implements InputProcessor {
     }
 
     public void defineDirection(int screenX, int screenY, Ball ball) {
-        int centerX = (int) (ball.positionOnScreen.x + ball.SIZE/2);
-        int centerY = (int) (ball.positionOnScreen.y + ball.SIZE/2);
+        int centerX = (int) (ball.positionOnScreen.x + ball.SIZE / 2);
+        int centerY = (int) (ball.positionOnScreen.y + ball.SIZE / 2);
 
         int diffX = centerX - screenX;
         int diffY = centerY - screenY;

@@ -22,6 +22,8 @@ public class PlayState extends State {
 
     Ball[] ballsOnField;
 
+    PlayController playController;
+
     public PlayState(GameStateManager gameStateManager) {
         super(gameStateManager);
 
@@ -34,19 +36,9 @@ public class PlayState extends State {
         this.balls = ballManager.getBalls();
         ballsOnField = new Ball[this.balls.size()];
 
-        PlayController playController = new PlayController(this.balls, this);
+        playController = new PlayController(this.balls, this);
         Gdx.input.setInputProcessor(playController);
 
-    }
-
-    @Override
-    protected void handleInput() {
-
-    }
-
-    @Override
-    public void update(float deltaTime) {
-        handleInput();
     }
 
     public Ball[] getBallsOnField() {
@@ -60,13 +52,16 @@ public class PlayState extends State {
     @Override
     public void render(SpriteBatch spriteBatch) {
         spriteBatch.begin();
-        spriteBatch.draw(background, 0, 150, Game.WIDTH, Game.WIDTH);
+        spriteBatch.draw(background, 0, Game.getInstance().verticalOffset, Game.getInstance().width, Game.getInstance().width);
         int index = 0;
         for (Ball ball : this.balls) {
             ball.getRotation();
             ballsOnField[index++] = ball;
 
-            ball.checkIsOutside();
+            if (Game.getInstance().isBallInMove) {
+                ball.checkIsOutside();
+                ball.checkIntersection();
+            }
 
             if (ball.isDoubleClicked) {
                 ball.positionOnScreen.x += ball.getVelocity().x;
@@ -76,6 +71,16 @@ public class PlayState extends State {
             spriteBatch.draw(ball, ball.positionOnScreen.x, ball.positionOnScreen.y, Ball.SIZE/2, Ball.SIZE/2, Ball.SIZE, Ball.SIZE, 1, 1, ball.getRotation(), true);
         }
         spriteBatch.end();
+    }
+
+    @Override
+    protected void handleInput() {
+
+    }
+
+    @Override
+    public void update(float deltaTime) {
+        handleInput();
     }
 
     @Override

@@ -11,23 +11,40 @@ import velychko.game.models.states.MenuState;
 
 public class Game extends ApplicationAdapter {
 
-    public static final int WIDTH = 720;
-    public static final int HEIGHT = 1240;
-
     public static final String TITLE = "Plush balls";
 
-    OrthographicCamera camera;
+    private static Game instance;
+
+    public static Game getInstance() {
+        if (instance == null) {
+            instance = new Game();
+        }
+        return instance;
+    }
+
+    private Game() { }
+
+    public int width;
+    public int height;
+    public int verticalOffset;
+
+    public  OrthographicCamera camera;
 
     private GameStateManager gameStateManager;
     private SpriteBatch batch;
 
+    public boolean isBallInMove = false;
 
     @Override
     public void create() {
+        width = Gdx.app.getGraphics().getWidth();
+        height = Gdx.app.getGraphics().getHeight();
+        verticalOffset = (height - width)/2;
+
         Gdx.gl.glClearColor(1, 1, 1, 0);
 
-        camera = new OrthographicCamera(WIDTH, HEIGHT);
-        camera.setToOrtho(true, WIDTH, HEIGHT);
+        camera = new OrthographicCamera(width, height);
+        camera.setToOrtho(true, width, height);
 
         batch = new SpriteBatch();
         gameStateManager = new GameStateManager();

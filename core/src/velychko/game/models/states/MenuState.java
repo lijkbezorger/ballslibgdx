@@ -30,8 +30,8 @@ public class MenuState extends State {
         stage = new Stage();
 
         background = new Texture("bg.png");
-        backgroundX = (int) (Game.WIDTH / 2 - background.getWidth() / 2);
-        backgroundY = (int) (Game.HEIGHT / 2 - background.getHeight() / 2 - 100);
+        backgroundX = Game.getInstance().width / 2 - background.getWidth() / 2;
+        backgroundY = Game.getInstance().height / 2 - background.getHeight() / 2 - 100;
 
         //Button
         textureAtlas = new TextureAtlas();

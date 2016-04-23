@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import velychko.game.Game;
@@ -19,7 +21,7 @@ public class Ball extends TextureRegion {
     public final static int DIRECTION_DOWN = 2;
     public final static int DIRECTION_RIGHT = 3;
 
-    public static final float SIZE = 72;
+    public static final float SIZE = Game.getInstance().width/10;
 
     public static final float SPEED = 3f;
 
@@ -44,10 +46,11 @@ public class Ball extends TextureRegion {
 
     public boolean isTouched;
 
+    public List<Ball> ballLine;
 
     public Ball(Vector2 position, Texture texture) {
         this.position = position;
-        this.positionOnScreen = new Vector2(Ball.SIZE * position.x, Ball.SIZE * position.y + 150);
+        this.positionOnScreen = new Vector2(Ball.SIZE * position.x, Ball.SIZE * position.y + Game.getInstance().verticalOffset);
         this.bounds.width = SIZE;
         this.bounds.height = SIZE;
         this.isPush = false;
@@ -186,13 +189,118 @@ public class Ball extends TextureRegion {
             }
         }
         this.setVelocity(speed);
+        Game.getInstance().isBallInMove = true;
+    }
+
+    public void setBallLine(List<Ball> balls) {
+        int ballX = (int) this.position.x;
+        int ballY = (int) this.position.y;
+        List<Ball> ballsInLine = new ArrayList<Ball>();
+        switch (this.getDirection()) {
+            case DIRECTION_UP: {
+                for (Ball ball : balls) {
+                    if (ball.position.y < ballY) {
+                        ballsInLine.add(ball);
+                    }
+                }
+                break;
+            }
+            case DIRECTION_RIGHT: {
+                for (Ball ball : balls) {
+                    if (ball.position.x > ballX) {
+                        ballsInLine.add(ball);
+                    }
+                }
+                break;
+            }
+            case DIRECTION_DOWN: {
+                for (Ball ball : balls) {
+                    if (ball.position.y > ballY) {
+                        ballsInLine.add(ball);
+                    }
+                }
+                break;
+            }
+            case DIRECTION_LEFT: {
+                for (Ball ball : balls) {
+                    if (ball.position.x < ballX) {
+                        ballsInLine.add(ball);
+                    }
+                }
+                break;
+            }
+            default: {
+
+            }
+        }
+        this.ballLine = ballsInLine;
     }
 
     public void checkIsOutside() {
-        if (this.positionOnScreen.x > Game.WIDTH-SIZE || this.positionOnScreen.x < 0 || this.positionOnScreen.y > Game.HEIGHT-370-SIZE || this.positionOnScreen.y < 150) {
+        int width = Game.getInstance().width;
+        int height = Game.getInstance().height;
+        int verticalOffset = Game.getInstance().verticalOffset;
+
+        if (this.positionOnScreen.x > width - SIZE || this.positionOnScreen.x < 0
+                || this.positionOnScreen.y > height - verticalOffset - SIZE || this.positionOnScreen.y < verticalOffset) {
             this.isTouched = false;
             this.isDoubleClicked = false;
-            this.positionOnScreen = new Vector2(Ball.SIZE * position.x, Ball.SIZE * position.y + 150);
+            this.ballLine = null;
+            this.positionOnScreen = new Vector2(Ball.SIZE * position.x, Ball.SIZE * position.y + Game.getInstance().verticalOffset);
+            Game.getInstance().isBallInMove = false;
+        }
+    }
+
+    public void checkIntersection() {
+        int ballX = (int) this.positionOnScreen.x;
+        int ballY = (int) this.positionOnScreen.y;
+        if (this.ballLine != null) {
+            switch (this.getDirection()) {
+                case DIRECTION_UP: {
+                    for (Ball ball : this.ballLine) {
+                        if (ballY <= ball.positionOnScreen.y - Ball.SIZE) {
+                            this.position = new Vector2(ball.position.x, ball.position.y - 1);
+                            this.positionOnScreen = new Vector2(Ball.SIZE * ball.position.x, Ball.SIZE * (ball.position.y - 1) + Game.getInstance().verticalOffset);
+                        }
+                    }
+                    break;
+                }
+                case DIRECTION_RIGHT: {
+                    for (Ball ball : this.ballLine) {
+                        if (ballX >= ball.positionOnScreen.x) {
+                            this.position = new Vector2(ball.position.x - 1, ball.position.y);
+                            this.positionOnScreen = new Vector2(Ball.SIZE * (ball.position.x - 1), Ball.SIZE * ball.position.y + Game.getInstance().verticalOffset);
+
+
+                        }
+                    }
+                    break;
+                }
+                case DIRECTION_DOWN: {
+                    for (Ball ball : this.ballLine) {
+                        if (ballY >= ball.positionOnScreen.y) {
+                            this.position = new Vector2(ball.position.x, ball.position.y + 1);
+                            this.positionOnScreen = new Vector2(Ball.SIZE * ball.position.x, Ball.SIZE * (ball.position.y + 1) + Game.getInstance().verticalOffset);
+
+
+                        }
+                    }
+                    break;
+                }
+                case DIRECTION_LEFT: {
+                    for (Ball ball : this.ballLine) {
+                        if (ballX <= ball.positionOnScreen.x - Ball.SIZE) {
+                            this.position = new Vector2(ball.position.x + 1, ball.position.y);
+                            this.positionOnScreen = new Vector2(Ball.SIZE * (ball.position.x + 1), Ball.SIZE * ball.position.y + Game.getInstance().verticalOffset);
+
+                        }
+                    }
+                    break;
+                }
+                default: {
+
+                }
+            }
         }
     }
 
