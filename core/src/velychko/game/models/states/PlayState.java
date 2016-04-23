@@ -38,7 +38,6 @@ public class PlayState extends State {
 
         playController = new PlayController(this.balls, this);
         Gdx.input.setInputProcessor(playController);
-
     }
 
     public Ball[] getBallsOnField() {
@@ -59,11 +58,19 @@ public class PlayState extends State {
             ballsOnField[index++] = ball;
 
             if (Game.getInstance().isBallInMove) {
-                ball.checkIsOutside();
+
+                if (ball.checkIsOutside(balls)) {
+                    Game.getInstance().isBallInMove = false;
+                    break;
+                }
                 ball.checkIntersection();
+
+                if (ball.isRamed) {
+                    ball.changeSpeed(balls);
+                }
             }
 
-            if (ball.isDoubleClicked) {
+            if (ball.isPush || ball.isPunched) {
                 ball.positionOnScreen.x += ball.getVelocity().x;
                 ball.positionOnScreen.y += ball.getVelocity().y;
             }

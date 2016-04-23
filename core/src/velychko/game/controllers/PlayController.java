@@ -47,6 +47,7 @@ public class PlayController implements InputProcessor {
                         secondClick = System.currentTimeMillis();
                         if ((secondClick - firstClick) < 200) {
                             ball.isDoubleClicked = true;
+                            ball.isPush = true;
                             ball.setSpeed();
                             ball.setBallLine(balls);
                         }

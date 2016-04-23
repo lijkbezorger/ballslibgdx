@@ -94,7 +94,7 @@ public class BallManager {
                         int x = Integer.parseInt(positionX.item(0).getChildNodes().item(0).getNodeValue());
                         int y = Integer.parseInt(positionY.item(0).getChildNodes().item(0).getNodeValue());
 
-                        ball = new Ball(new Vector2(y, x), ballTextures[generateImage()]);
+                        ball = new Ball(iter, new Vector2(x, y), ballTextures[generateImage()]);
                         levelBallList.add(ball);
                     }
 

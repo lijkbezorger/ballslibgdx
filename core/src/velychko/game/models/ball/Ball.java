@@ -21,12 +21,13 @@ public class Ball extends TextureRegion {
     public final static int DIRECTION_DOWN = 2;
     public final static int DIRECTION_RIGHT = 3;
 
-    public static final float SIZE = Game.getInstance().width/10;
+    public static final float SIZE = Game.getInstance().width / 10;
 
     public static final float SPEED = 3f;
 
-
     final Random random = new Random();
+
+    public String name;
 
     public Rectangle bounds = new Rectangle();
 
@@ -38,17 +39,22 @@ public class Ball extends TextureRegion {
 
     public int direction;
 
-    public boolean isPush;
+    public boolean isTouched;
 
     public boolean isDoubleClicked;
 
     public boolean isPunched;
 
-    public boolean isTouched;
+    public boolean isPush;
+
+    public boolean isRamed;
+
+    public Ball ramedBall;
 
     public List<Ball> ballLine;
 
-    public Ball(Vector2 position, Texture texture) {
+    public Ball(int iter, Vector2 position, Texture texture) {
+        this.name = Integer.toString(iter);
         this.position = position;
         this.positionOnScreen = new Vector2(Ball.SIZE * position.x, Ball.SIZE * position.y + Game.getInstance().verticalOffset);
         this.bounds.width = SIZE;
@@ -57,6 +63,7 @@ public class Ball extends TextureRegion {
         this.isDoubleClicked = false;
         this.isPunched = false;
         this.isTouched = false;
+        this.isRamed = false;
         this.direction = generateDirection();
         this.velocity = new Vector2(0, 0);
 
@@ -70,68 +77,12 @@ public class Ball extends TextureRegion {
         return _random;
     }
 
-    public boolean isTouched() {
-        return isTouched;
-    }
-
-    public void setIsTouched(boolean isTouched) {
-        this.isTouched = isTouched;
-    }
-
-    public boolean isPush() {
-        return isPush;
-    }
-
-    public void setIsPush(boolean isPush) {
-        this.isPush = isPush;
-    }
-
-    public boolean isPunched() {
-        return isPunched;
-    }
-
-    public void setIsPunched(boolean isPunched) {
-        this.isPunched = isPunched;
-    }
-
     public int getDirection() {
         return direction;
     }
 
     public void setDirection(int direction) {
         this.direction = direction;
-    }
-
-    public Vector2 getPosition() {
-        return position;
-    }
-
-    public float getPositionX() {
-        return position.y;
-    }
-
-    public float getPositionY() {
-        return position.x;
-    }
-
-    public void setPosition(Vector2 position) {
-        this.position = position;
-    }
-
-    public Vector2 getPositionOnScreen() {
-        return positionOnScreen;
-    }
-
-    public void setPositionOnScreen(Vector2 positionOnScreen) {
-        this.positionOnScreen = positionOnScreen;
-    }
-
-    public Rectangle getBounds() {
-        return bounds;
-    }
-
-    public void setBounds(Rectangle bounds) {
-        this.bounds = bounds;
     }
 
     public Vector2 getVelocity() {
@@ -199,7 +150,7 @@ public class Ball extends TextureRegion {
         switch (this.getDirection()) {
             case DIRECTION_UP: {
                 for (Ball ball : balls) {
-                    if (ball.position.y < ballY) {
+                    if (ball.position.y < ballY && ball.position.x == ballX) {
                         ballsInLine.add(ball);
                     }
                 }
@@ -207,7 +158,7 @@ public class Ball extends TextureRegion {
             }
             case DIRECTION_RIGHT: {
                 for (Ball ball : balls) {
-                    if (ball.position.x > ballX) {
+                    if (ball.position.x > ballX && ball.position.y == ballY) {
                         ballsInLine.add(ball);
                     }
                 }
@@ -215,7 +166,7 @@ public class Ball extends TextureRegion {
             }
             case DIRECTION_DOWN: {
                 for (Ball ball : balls) {
-                    if (ball.position.y > ballY) {
+                    if (ball.position.y > ballY && ball.position.x == ballX) {
                         ballsInLine.add(ball);
                     }
                 }
@@ -223,7 +174,7 @@ public class Ball extends TextureRegion {
             }
             case DIRECTION_LEFT: {
                 for (Ball ball : balls) {
-                    if (ball.position.x < ballX) {
+                    if (ball.position.x < ballX && ball.position.y == ballY) {
                         ballsInLine.add(ball);
                     }
                 }
@@ -236,19 +187,55 @@ public class Ball extends TextureRegion {
         this.ballLine = ballsInLine;
     }
 
-    public void checkIsOutside() {
+    public boolean checkIsOutside(List<Ball> balls) {
         int width = Game.getInstance().width;
         int height = Game.getInstance().height;
         int verticalOffset = Game.getInstance().verticalOffset;
 
         if (this.positionOnScreen.x > width - SIZE || this.positionOnScreen.x < 0
                 || this.positionOnScreen.y > height - verticalOffset - SIZE || this.positionOnScreen.y < verticalOffset) {
-            this.isTouched = false;
-            this.isDoubleClicked = false;
-            this.ballLine = null;
-            this.positionOnScreen = new Vector2(Ball.SIZE * position.x, Ball.SIZE * position.y + Game.getInstance().verticalOffset);
+            if (this.isPunched) {
+                unsetBall(this, balls);
+                return true;
+            } else {
+                this.isTouched = false;
+                this.isDoubleClicked = false;
+                this.ballLine = null;
+                this.positionOnScreen = new Vector2(Ball.SIZE * position.x, Ball.SIZE * position.y + Game.getInstance().verticalOffset);
+            }
+
             Game.getInstance().isBallInMove = false;
         }
+
+        return false;
+    }
+
+    public void unsetBall(Ball ball, List<Ball> balls) {
+        int index = balls.indexOf(ball);
+        balls.remove(index);
+    }
+
+
+    public void changeSpeed(List<Ball> balls) {
+        changeEnergy(this.ramedBall, this, balls);
+    }
+
+    public void stopOld(Ball ball) {
+        ball.velocity = new Vector2(0, 0);
+        ball.isTouched = false;
+        ball.isPush = false;
+        ball.isPunched = false;
+        ball.isDoubleClicked = false;
+        ball.ballLine = null;
+    }
+
+    public void changeEnergy(Ball ramedBall, Ball oldBall, List<Ball> balls) {
+        this.isRamed = false;
+        this.ramedBall = null;
+        ramedBall.direction = oldBall.direction;
+        ramedBall.setSpeed();
+        ramedBall.setBallLine(balls);
+        ramedBall.isPunched = true;
     }
 
     public void checkIntersection() {
@@ -258,41 +245,48 @@ public class Ball extends TextureRegion {
             switch (this.getDirection()) {
                 case DIRECTION_UP: {
                     for (Ball ball : this.ballLine) {
-                        if (ballY <= ball.positionOnScreen.y - Ball.SIZE) {
-                            this.position = new Vector2(ball.position.x, ball.position.y - 1);
-                            this.positionOnScreen = new Vector2(Ball.SIZE * ball.position.x, Ball.SIZE * (ball.position.y - 1) + Game.getInstance().verticalOffset);
+                        if (ballY <= ball.positionOnScreen.y + Ball.SIZE) {
+                            this.position = new Vector2(ball.position.x, ball.position.y + 1);
+                            this.positionOnScreen = new Vector2(Ball.SIZE * ball.position.x, Ball.SIZE * (ball.position.y + 1) + Game.getInstance().verticalOffset);
+                            this.isRamed = true;
+                            this.ramedBall = ball;
+                            stopOld(this);
                         }
                     }
                     break;
                 }
                 case DIRECTION_RIGHT: {
                     for (Ball ball : this.ballLine) {
-                        if (ballX >= ball.positionOnScreen.x) {
+                        if (ballX >= ball.positionOnScreen.x - Ball.SIZE) {
                             this.position = new Vector2(ball.position.x - 1, ball.position.y);
                             this.positionOnScreen = new Vector2(Ball.SIZE * (ball.position.x - 1), Ball.SIZE * ball.position.y + Game.getInstance().verticalOffset);
-
-
+                            this.isRamed = true;
+                            this.ramedBall = ball;
+                            stopOld(this);
                         }
                     }
                     break;
                 }
                 case DIRECTION_DOWN: {
                     for (Ball ball : this.ballLine) {
-                        if (ballY >= ball.positionOnScreen.y) {
-                            this.position = new Vector2(ball.position.x, ball.position.y + 1);
-                            this.positionOnScreen = new Vector2(Ball.SIZE * ball.position.x, Ball.SIZE * (ball.position.y + 1) + Game.getInstance().verticalOffset);
-
-
+                        if (ballY >= ball.positionOnScreen.y - Ball.SIZE) {
+                            this.position = new Vector2(ball.position.x, ball.position.y - 1);
+                            this.positionOnScreen = new Vector2(Ball.SIZE * ball.position.x, Ball.SIZE * (ball.position.y - 1) + Game.getInstance().verticalOffset);
+                            this.isRamed = true;
+                            this.ramedBall = ball;
+                            stopOld(this);
                         }
                     }
                     break;
                 }
                 case DIRECTION_LEFT: {
                     for (Ball ball : this.ballLine) {
-                        if (ballX <= ball.positionOnScreen.x - Ball.SIZE) {
+                        if (ballX <= ball.positionOnScreen.x + Ball.SIZE) {
                             this.position = new Vector2(ball.position.x + 1, ball.position.y);
                             this.positionOnScreen = new Vector2(Ball.SIZE * (ball.position.x + 1), Ball.SIZE * ball.position.y + Game.getInstance().verticalOffset);
-
+                            this.isRamed = true;
+                            this.ramedBall = ball;
+                            stopOld(this);
                         }
                     }
                     break;

@@ -7,7 +7,7 @@ import velychko.game.Game;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.width = Game.WIDTH;
+		config.width = Game.getInstance().width;
 		config.height = Game.getInstance().height;
 		config.title = Game.TITLE;
 		new LwjglApplication(Game.getInstance(), config);
