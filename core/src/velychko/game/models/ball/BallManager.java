@@ -30,9 +30,9 @@ public class BallManager {
 
     public Texture[] ballTextures;
 
-    private List<Level> levelList;
+    public List<Level> levelList;
 
-    private Level currentLevel;
+    public Level currentLevel;
 
 
     public BallManager() {

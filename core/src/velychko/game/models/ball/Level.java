@@ -11,11 +11,11 @@ import java.util.List;
  */
 public class Level {
 
-    private String levelName;
+    public String levelName;
 
-    private int levelNumber;
+    public int levelNumber;
 
-    private List<Ball> ballList;
+    public List<Ball> ballList;
 
     public Level(String levelName, int levelNumber, List<Ball> ballList) {
         this.levelName = levelName;

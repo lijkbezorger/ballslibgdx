@@ -9,25 +9,39 @@
             <position-x>4</position-x>
             <position-y>2</position-y>
         </ball>
+    </level>
+    <level name="Level 2" order="2">
+        <ball>
+            <position-x>4</position-x>
+            <position-y>0</position-y>
+        </ball>
+        <ball>
+            <position-x>4</position-x>
+            <position-y>2</position-y>
+        </ball>
         <ball>
             <position-x>4</position-x>
             <position-y>4</position-y>
         </ball>
+    </level>
+    <level name="Level 3" order="3">
         <ball>
             <position-x>4</position-x>
-            <position-y>6</position-y>
+            <position-y>0</position-y>
         </ball>
         <ball>
             <position-x>4</position-x>
-            <position-y>9</position-y>
+            <position-y>2</position-y>
+        </ball>
+    </level>
+    <level name="Level 4" order="4">
+        <ball>
+            <position-x>4</position-x>
+            <position-y>0</position-y>
         </ball>
         <ball>
-            <position-x>0</position-x>
-            <position-y>4</position-y>
-        </ball>
-        <ball>
-            <position-x>9</position-x>
-            <position-y>4</position-y>
+            <position-x>4</position-x>
+            <position-y>2</position-y>
         </ball>
     </level>
 </levels>

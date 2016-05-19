@@ -2,10 +2,14 @@ package velychko.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 
+import velychko.game.models.ball.BallManager;
 import velychko.game.models.states.GameStateManager;
 import velychko.game.models.states.MenuState;
 
@@ -28,10 +32,15 @@ public class Game extends ApplicationAdapter {
     public int height;
     public int verticalOffset;
 
+    public BallManager ballManager;
+
     public  OrthographicCamera camera;
 
     private GameStateManager gameStateManager;
     private SpriteBatch batch;
+
+    public TextureAtlas forms;
+    public TextureAtlas skin;
 
     public boolean isBallInMove = false;
 
@@ -40,11 +49,16 @@ public class Game extends ApplicationAdapter {
         width = Gdx.app.getGraphics().getWidth();
         height = Gdx.app.getGraphics().getHeight();
         verticalOffset = (height - width)/2;
+        ballManager = new BallManager();
 
         Gdx.gl.glClearColor(1, 1, 1, 0);
 
         camera = new OrthographicCamera(width, height);
         camera.setToOrtho(true, width, height);
+
+        forms = new TextureAtlas(Gdx.files.internal("ui-green.atlas"));
+        skin = new TextureAtlas(Gdx.files.internal("data/uiskin.atlas"));
+
 
         batch = new SpriteBatch();
         gameStateManager = new GameStateManager();

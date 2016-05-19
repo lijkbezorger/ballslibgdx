@@ -3,6 +3,8 @@ package velychko.game.models.states;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 import java.util.List;
 
@@ -10,11 +12,16 @@ import velychko.game.Game;
 import velychko.game.controllers.PlayController;
 import velychko.game.models.ball.Ball;
 import velychko.game.models.ball.BallManager;
+import velychko.game.models.uicomponent.FinishDialog;
 
 /**
  * @author Yaroslav Velychko
  */
 public class PlayState extends State {
+
+    private Stage stage;
+
+    public FinishDialog finishDialog;
 
     private Texture background;
 
@@ -24,20 +31,29 @@ public class PlayState extends State {
 
     PlayController playController;
 
-    public PlayState(GameStateManager gameStateManager) {
+    public PlayState(GameStateManager gameStateManager, int level) {
         super(gameStateManager);
 
         background = new Texture("field.png");
 
         BallManager ballManager = new BallManager();
 
-        ballManager.setCurrentLevel(1);
+        ballManager.setCurrentLevel(level);
         ballManager.getLevelName();
         this.balls = ballManager.getBalls();
         ballsOnField = new Ball[this.balls.size()];
 
         playController = new PlayController(this.balls, this);
         Gdx.input.setInputProcessor(playController);
+
+//        stage = new Stage();
+//
+//        Skin skin = new Skin(Gdx.files.internal("data/uiskin.json"), Game.getInstance().skin);
+//        finishDialog = new FinishDialog("go next", skin, gameStateManager);
+//        finishDialog.show(stage);
+//        stage.addActor(finishDialog);
+//
+//        Gdx.input.setInputProcessor(stage);
     }
 
     public Ball[] getBallsOnField() {
@@ -75,8 +91,13 @@ public class PlayState extends State {
                 ball.positionOnScreen.y += ball.getVelocity().y;
             }
 
-            spriteBatch.draw(ball, ball.positionOnScreen.x, ball.positionOnScreen.y, Ball.SIZE/2, Ball.SIZE/2, Ball.SIZE, Ball.SIZE, 1, 1, ball.getRotation(), true);
+
+            spriteBatch.draw(ball, ball.positionOnScreen.x, ball.positionOnScreen.y, Ball.SIZE / 2, Ball.SIZE / 2, Ball.SIZE, Ball.SIZE, 1, 1, ball.getRotation(), true);
         }
+        if (balls.size() == 1) {
+            stage.draw();
+        }
+
         spriteBatch.end();
     }
 
